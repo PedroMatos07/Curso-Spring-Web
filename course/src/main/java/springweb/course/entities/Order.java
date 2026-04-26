@@ -1,10 +1,13 @@
 package springweb.course.entities;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
+import springweb.course.entities.enums.OrderStatus;
 
 import java.io.Serializable;
 import java.time.Instant;
 import java.util.Objects;
+import java.util.Optional;
 
 @Entity
 @Table(name = "tb_order")
@@ -13,18 +16,23 @@ public class Order implements Serializable {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'", timezone = "GMT")
     private Instant moment;
 
     @ManyToOne
     @JoinColumn(name= "client_id")
     private User client;
 
+    private Integer orderStatus;
+
     public Order(){
     }
-    public Order(Instant moment, Long id, User client) {
+    public Order(Instant moment, Long id, User client, OrderStatus orderStatus) {
         this.moment = moment;
         this.id = id;
         this.client = client;
+        setOrderStatus(orderStatus);
     }
 
     public Long getId() {
@@ -49,6 +57,16 @@ public class Order implements Serializable {
 
     public void setMoment(Instant moment) {
         this.moment = moment;
+    }
+
+    public OrderStatus getOrderStatus() {
+        return OrderStatus.valueOf(orderStatus);
+    }
+
+    public void setOrderStatus(OrderStatus orderStatus) {
+        if(orderStatus!=null) {
+            this.orderStatus = orderStatus.getCode();
+        }
     }
 
     @Override
