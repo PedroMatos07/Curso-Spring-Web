@@ -6,13 +6,16 @@ import springweb.course.entities.enums.OrderStatus;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.HashSet;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 
 @Entity
 @Table(name = "tb_order")
 public class Order implements Serializable {
-    private static final long SerialVersionUID= 1L;
+
+    private static final long serialVersionUID = 1L;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -26,8 +29,16 @@ public class Order implements Serializable {
 
     private Integer orderStatus;
 
+    @OneToMany(mappedBy = "id.order")
+    private Set<OrderItem> items = new HashSet<>();
+
+
+    @OneToOne(mappedBy = "order", cascade = CascadeType.ALL)
+    private Payment payment;
+
     public Order(){
     }
+
     public Order(Instant moment, Long id, User client, OrderStatus orderStatus) {
         this.moment = moment;
         this.id = id;
@@ -69,6 +80,25 @@ public class Order implements Serializable {
         }
     }
 
+    public Payment getPayment() {
+        return payment;
+    }
+
+    public void setPayment(Payment payment) {
+        this.payment = payment;
+    }
+
+    public Set<OrderItem> getItems() {
+        return items;
+    }
+    
+    public Double getTotal(){
+        double soma = 0.0;
+        for(OrderItem x : items){
+            soma += x.getSubTotal();
+        }
+        return soma; 
+    }
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
