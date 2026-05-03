@@ -33,14 +33,13 @@ public class UserService {
         return userRepository.save(obj);
     }
 
-    public void delete(Long id){
-        try {
-            userRepository.deleteById(id);
-        }
-        catch (EmptyResultDataAccessException e){
+    public void delete(Long id) {
+        if (!userRepository.existsById(id)) {
             throw new ResourceNotFoundException(id);
         }
-        catch (DataIntegrityViolationException e){
+        try {
+            userRepository.deleteById(id);
+        } catch (DataIntegrityViolationException e) {
             throw new DataBaseExceptions(e.getMessage());
         }
     }
